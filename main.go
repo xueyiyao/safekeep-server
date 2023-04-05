@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/xueyiyao/safekeep/controllers"
 	initializers "github.com/xueyiyao/safekeep/initializers"
@@ -27,6 +30,8 @@ func main() {
 
 	r.Use(middleware.RequireAuth)
 	routes.AddRoutes(r)
+
+	fmt.Println("Listening on Port", os.Getenv("PORT"))
 
 	r.Run()
 }
