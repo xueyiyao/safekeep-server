@@ -81,6 +81,20 @@ func ReadItems(c *gin.Context) {
 	})
 }
 
+func UpdateItem(c *gin.Context) {
+	itemId := c.Param(("id"))
+	var item models.Item
+	initializers.DB.First(&item, itemId)
+
+	var body struct {
+		Name string
+	}
+
+	c.Bind(&body)
+	item.Name = body.Name
+	initializers.DB.Save(&item)
+}
+
 func StoreItem(c *gin.Context) {
 	itemId := c.Param(("id"))
 	var item models.Item

@@ -11,6 +11,7 @@ func ItemRoutes(router *gin.Engine) {
 		itemRouter.POST("/", controllers.CreateItem)
 		itemRouter.GET("/", controllers.ReadItems)
 		itemRouter.GET("/:id", controllers.ReadItem)
+		itemRouter.PUT("/:id", controllers.UpdateItem)
 		itemRouter.PUT("/store/:id", controllers.StoreItem)
 	}
 }
