@@ -41,3 +41,17 @@ func ReadContainers(c *gin.Context) {
 		"containers": containers,
 	})
 }
+
+func UpdateContainer(c *gin.Context) {
+	containerId := c.Param(("id"))
+	var container models.Container
+	initializers.DB.First(&container, containerId)
+
+	var body struct {
+		Name string
+	}
+
+	c.Bind(&body)
+	container.Name = body.Name
+	initializers.DB.Save(&container)
+}
