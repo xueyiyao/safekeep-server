@@ -37,3 +37,20 @@ func ReadUser(c *gin.Context) {
 		"user": user,
 	})
 }
+
+func UpdateUser(c *gin.Context) {
+	// TODO: Check for name and email
+	userId := c.Param(("id"))
+	var user models.User
+	initializers.DB.First(&user, userId)
+
+	var body struct {
+		Name  string
+		Email string
+	}
+
+	c.Bind(&body)
+	user.Name = body.Name
+	user.Email = body.Email
+	initializers.DB.Save(&user)
+}
