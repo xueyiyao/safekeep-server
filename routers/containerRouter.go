@@ -10,5 +10,6 @@ func ContainerRoutes(router *gin.Engine) {
 	{
 		containerRouter.POST("/", controllers.CreateContainer)
 		containerRouter.GET("/", controllers.ReadContainers)
+		containerRouter.PUT("/:id", controllers.UpdateContainer)
 	}
 }
