@@ -12,6 +12,12 @@ foo@bar:~$ go build
 foo@bar:~$ CompileDaemon -command="./safekeep"
 ```
 
+## Migrating the database
+
+```console
+foo@bar:~$ go run migrate/migrate.go
+```
+
 ## Admin Login
 
 To build and debug APIs, logging in as the admin user with the url below will return a cookie that allows access to the rest of Safekeep's API. If you are using Postman, the cookie should be automatically saved so that you may start accessing the other APIs immediately.
