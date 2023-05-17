@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	cors "github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/xueyiyao/safekeep/controllers"
 	initializers "github.com/xueyiyao/safekeep/initializers"
@@ -19,6 +20,12 @@ func init() {
 
 func main() {
 	r := gin.Default()
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{"POST", "GET", "PUT", "DELETE"},
+		AllowHeaders: []string{"Content-Type, access-control-allow-origin, access-control-allow-headers, user-id"},
+	}))
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
