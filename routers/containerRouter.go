@@ -8,8 +8,8 @@ import (
 func ContainerRoutes(router *gin.Engine) {
 	containerRouter := router.Group("/containers")
 	{
-		containerRouter.POST("/", controllers.CreateContainer)
-		containerRouter.GET("/", controllers.ReadContainers)
+		containerRouter.POST("", controllers.CreateContainer)
+		containerRouter.GET("", controllers.ReadContainers)
 		containerRouter.PUT("/:id", controllers.UpdateContainer)
 	}
 }
