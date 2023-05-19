@@ -1,12 +1,13 @@
 package controllers
 
 import (
+	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/xueyiyao/safekeep/initializers"
+	"github.com/xueyiyao/safekeep/models/google"
 	"golang.org/x/oauth2"
 )
 
@@ -26,11 +27,11 @@ func HandleGoogleLogin(c *gin.Context) {
 		c.Redirect(http.StatusTemporaryRedirect, "/")
 		return
 	}
-	// fmt.Println("Content", string(content))
+
 	c.JSON(200, content)
 }
 
-func getUserInfo(state string, code string) ([]byte, error) {
+func getUserInfo(state string, code string) (*google.GoogleUserEmailResponse, error) {
 	if state != initializers.OAuthStateString {
 		return nil, fmt.Errorf("invalid oauth state")
 	}
@@ -43,8 +44,9 @@ func getUserInfo(state string, code string) ([]byte, error) {
 		return nil, fmt.Errorf("failed getting user info: %s", err.Error())
 	}
 	defer response.Body.Close()
-	contents, err := ioutil.ReadAll(response.Body)
-	fmt.Println(contents)
+	var contents *google.GoogleUserEmailResponse
+
+	err = json.NewDecoder(response.Body).Decode(&contents)
 	if err != nil {
 		return nil, fmt.Errorf("failed reading response body: %s", err.Error())
 	}
