@@ -16,6 +16,7 @@ import (
 func init() {
 	initializers.LoadEnvVars()
 	initializers.ConnectToDB()
+	initializers.SetupOAuthLogin()
 }
 
 func main() {
@@ -34,6 +35,7 @@ func main() {
 	})
 
 	r.POST("/admin/login", controllers.AdminLogin)
+	routes.LoginRoutes(r)
 
 	r.Use(middleware.RequireAuth)
 	routes.AddRoutes(r)
