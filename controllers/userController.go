@@ -1,23 +1,53 @@
 package controllers
 
 import (
+	"strconv"
+
 	"github.com/gin-gonic/gin"
-	"github.com/xueyiyao/safekeep/initializers"
+	"github.com/xueyiyao/safekeep/logic"
 	"github.com/xueyiyao/safekeep/models"
 )
 
 func CreateUser(c *gin.Context) {
 	var body struct {
-		Name  string
-		Email string
+		Name  *string
+		Email *string
 	}
 
 	c.Bind(&body)
 
-	user := models.User{Name: body.Name, Email: body.Email}
-	result := initializers.DB.Create(&user)
+	// check if required data is present
+	if body.Name == nil || body.Email == nil {
+		c.Status(400)
+		return
+	}
 
-	if result.Error != nil {
+	user := models.User{Name: *(body.Name), Email: *(body.Email)}
+
+	// call logic layer
+	result, err := logic.CreateUser(&user)
+
+	if err != nil {
+		c.Status(400)
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"user": result,
+	})
+}
+
+func ReadUser(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param(("id")))
+
+	if err != nil {
+		c.Status(400)
+		return
+	}
+
+	user, err := logic.ReadUser(id)
+
+	if err != nil {
 		c.Status(400)
 		return
 	}
@@ -27,30 +57,36 @@ func CreateUser(c *gin.Context) {
 	})
 }
 
-func ReadUser(c *gin.Context) {
-	id := c.Param(("id"))
-
-	var user models.User
-	initializers.DB.First(&user, id)
-
-	c.JSON(200, gin.H{
-		"user": user,
-	})
-}
-
 func UpdateUser(c *gin.Context) {
-	// TODO: Check for name and email
-	userId := c.Param(("id"))
-	var user models.User
-	initializers.DB.First(&user, userId)
+	userId, err := strconv.Atoi(c.Param(("id")))
+
+	if err != nil {
+		c.Status(400)
+		return
+	}
+
+	user := models.User{ID: uint(userId)}
 
 	var body struct {
-		Name  string
-		Email string
+		Name  *string
+		Email *string
 	}
 
 	c.Bind(&body)
-	user.Name = body.Name
-	user.Email = body.Email
-	initializers.DB.Save(&user)
+
+	if body.Name != nil {
+		user.Name = *(body.Name)
+	}
+	if body.Email != nil {
+		user.Email = *(body.Email)
+	}
+
+	err = logic.UpdateUser(&user)
+
+	if err != nil {
+		c.Status(400)
+		return
+	}
+
+	c.Status(200)
 }
