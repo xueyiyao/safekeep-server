@@ -10,6 +10,6 @@ type User struct {
 	gorm.Model
 	ID        uint   `gorm:"primaryKey"`
 	Name      string `gorm:"not null"`
-	Email     string `gorm:"not null"`
+	Email     string `gorm:"not null;unique"`
 	CreatedAt time.Time
 }
