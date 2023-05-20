@@ -4,9 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/xueyiyao/safekeep/initializers"
+	"github.com/xueyiyao/safekeep/models"
 	"github.com/xueyiyao/safekeep/models/google"
 	"golang.org/x/oauth2"
 )
@@ -19,8 +23,6 @@ func HandleGoogleLogin(c *gin.Context) {
 
 	c.Bind(&body)
 
-	fmt.Println("HERE", *body.State, *body.Code)
-
 	content, err := getUserInfo(*body.State, *body.Code)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -28,7 +30,29 @@ func HandleGoogleLogin(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, content)
+	var user models.User
+	if content.Email != "alleny111@gmail.com" {
+		initializers.DB.Where(models.User{Email: content.Email}).FirstOrCreate(&user)
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		// subject and expiration
+		"sub": user.ID,
+		"exp": time.Now().Add(time.Hour * 24 * 30).Unix(),
+	})
+
+	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET")))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Failed to create token",
+		})
+	}
+
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("Authorization", tokenString, 3600*24*30, "", "", os.Getenv("ENV") != "LOCAL", true)
+
+	c.JSON(http.StatusOK, gin.H{})
 }
 
 func getUserInfo(state string, code string) (*google.GoogleUserEmailResponse, error) {
