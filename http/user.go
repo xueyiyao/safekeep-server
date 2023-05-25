@@ -1,14 +1,23 @@
-package controllers
+package http
 
 import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/xueyiyao/safekeep/domain"
 	"github.com/xueyiyao/safekeep/logic"
-	"github.com/xueyiyao/safekeep/models"
 )
 
-func CreateUser(c *gin.Context) {
+func (s *Server) registerUserRoutes(router *gin.Engine) {
+	userRouter := router.Group("/users")
+	{
+		userRouter.POST("", s.CreateUser)
+		userRouter.GET("/:id", s.ReadUser)
+		userRouter.PUT("/:id", s.UpdateUser)
+	}
+}
+
+func (s *Server) CreateUser(c *gin.Context) {
 	var body struct {
 		Name  *string
 		Email *string
@@ -22,22 +31,20 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	user := models.User{Name: *(body.Name), Email: *(body.Email)}
+	user := domain.User{Name: *(body.Name), Email: *(body.Email)}
 
 	// call logic layer
-	result, err := logic.CreateUser(&user)
+	err := s.UserService.CreateUser(&user)
 
 	if err != nil {
 		c.Status(400)
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"user": result,
-	})
+	c.Status(200)
 }
 
-func ReadUser(c *gin.Context) {
+func (s *Server) ReadUser(c *gin.Context) {
 	id, err := strconv.Atoi(c.Param(("id")))
 
 	if err != nil {
@@ -57,7 +64,7 @@ func ReadUser(c *gin.Context) {
 	})
 }
 
-func UpdateUser(c *gin.Context) {
+func (s *Server) UpdateUser(c *gin.Context) {
 	userId, err := strconv.Atoi(c.Param(("id")))
 
 	if err != nil {
@@ -65,7 +72,7 @@ func UpdateUser(c *gin.Context) {
 		return
 	}
 
-	user := models.User{ID: uint(userId)}
+	user := domain.User{ID: uint(userId)}
 
 	var body struct {
 		Name  *string
@@ -81,12 +88,14 @@ func UpdateUser(c *gin.Context) {
 		user.Email = *(body.Email)
 	}
 
-	err = logic.UpdateUser(&user)
+	result, err := s.UserService.UpdateUser(&user)
 
 	if err != nil {
 		c.Status(400)
 		return
 	}
 
-	c.Status(200)
+	c.JSON(200, gin.H{
+		"result": result,
+	})
 }
