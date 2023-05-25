@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"os"
 
-	cors "github.com/gin-contrib/cors"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/xueyiyao/safekeep/controllers"
+	HTTP "github.com/xueyiyao/safekeep/http"
 	initializers "github.com/xueyiyao/safekeep/initializers"
-	middleware "github.com/xueyiyao/safekeep/middleware"
+	"github.com/xueyiyao/safekeep/middleware"
 	routes "github.com/xueyiyao/safekeep/routers"
 )
 
@@ -20,6 +21,11 @@ func init() {
 }
 
 func main() {
+	s := HTTP.NewServer()
+	s.Run()
+}
+
+func otherMain() {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
