@@ -13,6 +13,7 @@ type Server struct {
 	Router           *gin.Engine
 	UserService      domain.UserService
 	ContainerService domain.ContainerService
+	ItemService      domain.ItemService
 }
 
 func NewServer() *Server {
@@ -20,6 +21,7 @@ func NewServer() *Server {
 		Router:           gin.Default(),
 		UserService:      repository.NewUserService(initializers.DB),
 		ContainerService: repository.NewContainerService(initializers.DB),
+		ItemService:      repository.NewItemService(initializers.DB),
 	}
 
 	return s
@@ -30,6 +32,7 @@ func (s *Server) Run() error {
 	r := s.Router
 	s.registerUserRoutes(r)
 	s.RegisterContainerRoutes(r)
+	s.registerItemRoutes(r)
 
 	err := r.Run()
 

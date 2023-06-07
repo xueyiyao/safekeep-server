@@ -5,7 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/xueyiyao/safekeep/domain"
-	"github.com/xueyiyao/safekeep/logic"
 )
 
 func (s *Server) registerUserRoutes(router *gin.Engine) {
@@ -52,7 +51,7 @@ func (s *Server) ReadUser(c *gin.Context) {
 		return
 	}
 
-	user, err := logic.ReadUser(id)
+	user, err := s.UserService.FindUserByID(id)
 
 	if err != nil {
 		c.Status(400)
