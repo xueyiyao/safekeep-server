@@ -1,0 +1,27 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Docker
+        uses: docker://xueyiyao/safekeep:latest
+
+      - name: Create and start Docker container
+        run: docker run --name mock-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres
+
+      - name: Run tests
+        run: |
+          go test
+          # Additional test commands
+
+      - name: Stop and remove Docker container
+        run: |
+          docker stop mock-postgres
+          docker rm mock-postgres
