@@ -10,9 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Docker
-        uses: docker/setup-docker@v1
-
       - name: Pull PostgreSQL image
         run: docker pull postgres
 
