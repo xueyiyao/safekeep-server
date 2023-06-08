@@ -2,27 +2,33 @@ name: Run Tests
 
 on:
   push:
-    branches:
-      - main
+    # branches:
+    #  - main
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Set up Docker
-        uses: docker/setup-docker@v1
-
       - name: Pull PostgreSQL image
         run: docker pull postgres
 
       - name: Create and start Docker container
         run: docker run --name mock-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres
 
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.19
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
       - name: Run tests
         run: |
+          cd $GITHUB_WORKSPACE
           go test
-          # Additional test commands
+          # Add additional test commands if needed
 
       - name: Stop and remove Docker container
         run: |
