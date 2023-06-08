@@ -11,7 +11,10 @@ jobs:
 
     steps:
       - name: Set up Docker
-        uses: docker://xueyiyao/safekeep:latest
+        uses: docker/setup-docker@v1
+
+      - name: Pull PostgreSQL image
+        run: docker pull postgres
 
       - name: Create and start Docker container
         run: docker run --name mock-postgres -e POSTGRES_PASSWORD=mysecretpassword -p 5432:5432 -d postgres
