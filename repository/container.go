@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	"github.com/xueyiyao/safekeep/domain"
-	"github.com/xueyiyao/safekeep/initializers"
 	"gorm.io/gorm"
 )
 
@@ -30,7 +29,7 @@ func (s *ContainerService) FindContainerByID(id int) (*domain.Container, error) 
 
 func (s *ContainerService) FindContainers(user_id int) ([]*domain.Container, error) {
 	var containers []*domain.Container
-	initializers.DB.Where("user_id <> ?", user_id).Find(&containers)
+	s.db.Where("user_id <> ?", user_id).Find(&containers)
 
 	// TODO: check for errors
 
@@ -38,7 +37,7 @@ func (s *ContainerService) FindContainers(user_id int) ([]*domain.Container, err
 }
 
 func (s *ContainerService) CreateContainer(container *domain.Container) error {
-	result := initializers.DB.Create(container)
+	result := s.db.Create(container)
 
 	if result.Error != nil {
 		return result.Error
@@ -48,7 +47,7 @@ func (s *ContainerService) CreateContainer(container *domain.Container) error {
 }
 
 func (s *ContainerService) UpdateContainer(container *domain.Container) (*domain.Container, error) {
-	result := initializers.DB.Model(container).Updates(*container)
+	result := s.db.Model(container).Updates(*container)
 
 	if result.Error != nil {
 		return nil, result.Error
