@@ -39,13 +39,15 @@ func (s *Server) CreateContainer(c *gin.Context) {
 }
 
 func (s *Server) ReadContainers(c *gin.Context) {
-	var body struct {
-		UserID uint
+	userIDStr := c.GetHeader("user-id")
+	userID, err := strconv.Atoi(userIDStr)
+
+	if err != nil {
+		c.Status(403)
+		return
 	}
 
-	c.Bind(&body)
-
-	containers, err := s.ContainerService.FindContainers(int(body.UserID))
+	containers, err := s.ContainerService.FindContainers(userID)
 
 	if err != nil {
 		c.Status(400)
