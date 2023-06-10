@@ -10,7 +10,7 @@ import (
 	HTTP "github.com/xueyiyao/safekeep/http"
 	initializers "github.com/xueyiyao/safekeep/initializers"
 	"github.com/xueyiyao/safekeep/middleware"
-	"github.com/xueyiyao/safekeep/repository"
+	"github.com/xueyiyao/safekeep/postgres"
 	routes "github.com/xueyiyao/safekeep/routers"
 )
 
@@ -30,12 +30,12 @@ func main() {
 }
 
 type Main struct {
-	DB         *repository.DB
+	DB         *postgres.DB
 	HTTPServer *HTTP.Server
 }
 
 func NewMain() *Main {
-	return &Main{DB: repository.NewDB(""), HTTPServer: HTTP.NewServer()}
+	return &Main{DB: postgres.NewDB(""), HTTPServer: HTTP.NewServer()}
 }
 
 func (m *Main) Run() (err error) {
@@ -44,9 +44,9 @@ func (m *Main) Run() (err error) {
 		return fmt.Errorf("cannot open db: %w", err)
 	}
 
-	userService := repository.NewUserService(m.DB.DB)
-	containerService := repository.NewContainerService(m.DB.DB)
-	itemServce := repository.NewItemService(m.DB.DB)
+	userService := postgres.NewUserService(m.DB.DB)
+	containerService := postgres.NewContainerService(m.DB.DB)
+	itemServce := postgres.NewItemService(m.DB.DB)
 
 	m.HTTPServer.UserService = userService
 	m.HTTPServer.ContainerService = containerService
