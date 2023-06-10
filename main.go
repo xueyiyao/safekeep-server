@@ -10,19 +10,52 @@ import (
 	HTTP "github.com/xueyiyao/safekeep/http"
 	initializers "github.com/xueyiyao/safekeep/initializers"
 	"github.com/xueyiyao/safekeep/middleware"
+	"github.com/xueyiyao/safekeep/repository"
 	routes "github.com/xueyiyao/safekeep/routers"
 )
 
 // Runs before main
 func init() {
 	initializers.LoadEnvVars()
-	initializers.ConnectToDB()
+	// initializers.ConnectToDB()
 	initializers.SetupOAuthLogin()
 }
 
 func main() {
-	s := HTTP.NewServer()
-	s.Run()
+	m := NewMain()
+	if err := m.Run(); err != nil {
+		// Handle Gracefully
+		fmt.Println(err)
+	}
+}
+
+type Main struct {
+	DB         *repository.DB
+	HTTPServer *HTTP.Server
+}
+
+func NewMain() *Main {
+	return &Main{DB: repository.NewDB(""), HTTPServer: HTTP.NewServer()}
+}
+
+func (m *Main) Run() (err error) {
+	m.DB.DSN = os.Getenv("DB_URL")
+	if err = m.DB.Open(); err != nil {
+		return fmt.Errorf("cannot open db: %w", err)
+	}
+
+	userService := repository.NewUserService(m.DB.DB)
+	containerService := repository.NewContainerService(m.DB.DB)
+	itemServce := repository.NewItemService(m.DB.DB)
+
+	m.HTTPServer.UserService = userService
+	m.HTTPServer.ContainerService = containerService
+	m.HTTPServer.ItemService = itemServce
+
+	if err = m.HTTPServer.Run(); err != nil {
+		return err
+	}
+	return nil
 }
 
 func otherMain() {
