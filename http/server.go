@@ -5,8 +5,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/xueyiyao/safekeep/domain"
-	"github.com/xueyiyao/safekeep/initializers"
-	"github.com/xueyiyao/safekeep/repository"
 )
 
 type Server struct {
@@ -18,10 +16,7 @@ type Server struct {
 
 func NewServer() *Server {
 	s := &Server{
-		Router:           gin.Default(),
-		UserService:      repository.NewUserService(initializers.DB),
-		ContainerService: repository.NewContainerService(initializers.DB),
-		ItemService:      repository.NewItemService(initializers.DB),
+		Router: gin.Default(),
 	}
 
 	return s
