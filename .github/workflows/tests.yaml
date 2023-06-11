@@ -27,7 +27,7 @@ jobs:
       - name: Run tests
         run: |
           cd $GITHUB_WORKSPACE
-          go test
+          go test ./...
           # Add additional test commands if needed
 
       - name: Stop and remove Docker container
