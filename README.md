@@ -27,3 +27,11 @@ curl --location --request POST '{url}/admin/login' \
 --header 'id: {admin-id}' \
 --header 'Authorization: {auth}'
 ```
+
+## Testing Locally
+
+To run tests, simply execute the following command, which will use a throwaway postgres docker container to run all unit tests.
+
+```
+./test.sh
+```
