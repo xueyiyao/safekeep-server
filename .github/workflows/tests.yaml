@@ -24,10 +24,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+
       - name: Run tests
         run: |
           cd $GITHUB_WORKSPACE
-          go test
+          go test ./...
           # Add additional test commands if needed
 
       - name: Stop and remove Docker container
