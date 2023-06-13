@@ -39,6 +39,16 @@ func TestUserService_CreateUser(t *testing.T) {
 	})
 
 	// Ensure an error is returned if user name is not set.
+	t.Run("ErrNilUser", func(t *testing.T) {
+		db := MustOpenDB(t)
+		defer MustCloseDB(t, db)
+		s := postgres.NewUserService(db.DB)
+		if err := s.CreateUser(nil); err == nil {
+			t.Fatal("expected an error, none occured")
+		}
+	})
+
+	// Ensure an error is returned if user name is not set.
 	t.Run("ErrNameRequired", func(t *testing.T) {
 		db := MustOpenDB(t)
 		defer MustCloseDB(t, db)
