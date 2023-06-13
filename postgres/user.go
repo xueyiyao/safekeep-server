@@ -2,6 +2,8 @@ package postgres
 
 import (
 	"errors"
+	"net/mail"
+	"strings"
 
 	"github.com/xueyiyao/safekeep/domain"
 	"gorm.io/gorm"
@@ -27,6 +29,22 @@ func (s *UserService) FindUserByID(id int) (*domain.User, error) {
 }
 
 func (s *UserService) CreateUser(user *domain.User) error {
+	if user == nil {
+		return errors.New("NilUser")
+	}
+
+	if len(strings.TrimSpace(user.Name)) == 0 {
+		return errors.New("EmptyUserName")
+	}
+
+	if len(strings.TrimSpace(user.Email)) == 0 {
+		return errors.New("EmptyEmail")
+	}
+
+	if _, err := mail.ParseAddress(strings.TrimSpace(user.Email)); err != nil {
+		return err
+	}
+
 	result := s.db.Create(user)
 
 	if result.Error != nil {
