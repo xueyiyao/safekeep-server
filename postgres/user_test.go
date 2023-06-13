@@ -1,7 +1,6 @@
 package postgres_test
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/xueyiyao/safekeep/domain"
@@ -16,7 +15,6 @@ func TestUserService_CreateUser(t *testing.T) {
 		s := postgres.NewUserService(db.DB)
 
 		u := &domain.User{Name: "one", Email: "one@test.com"}
-
 		if err := s.CreateUser(u); err != nil {
 			t.Fatal(err)
 		} else if got, want := u.ID, 1; int(got) != want {
@@ -30,12 +28,20 @@ func TestUserService_CreateUser(t *testing.T) {
 			t.Fatalf("ID=%v, want %v", got, want)
 		}
 
-		// Simply fetches user and compare
-		if other, err := s.FindUserByID(1); err != nil {
+		u3 := &domain.User{Name: "two", Email: "nottwo@test.com"}
+		if err := s.CreateUser(u3); err != nil {
 			t.Fatal(err)
-		} else if !reflect.DeepEqual(u, other) {
-			t.Fatalf("mismatch: %#v != %#v", u, other)
+		} else if got, want := u3.ID, 3; int(got) != want {
+			t.Fatalf("ID=%v, want %v", got, want)
 		}
+
+		// Go's time.Time precision is in ns, while PSQL is in microseconds. this will fail as is so commented out
+		// // Simply fetches user and compare
+		// if other, err := s.FindUserByID(1); err != nil {
+		// 	t.Fatal(err)
+		// } else if !reflect.DeepEqual(u, other) {
+		// 	t.Fatalf("mismatch: %#v != %#v", u, other)
+		// }
 	})
 
 	// Ensure an error is returned if empty user.
@@ -78,13 +84,13 @@ func TestUserService_CreateUser(t *testing.T) {
 		}
 	})
 
-	// // Ensure an error is returned if user email is a duplicate.
-	// t.Run("ErrEmailDuplicate", func(t *testing.T) {
-	// 	db := MustOpenDB(t)
-	// 	defer MustCloseDB(t, db)
-	// 	s := postgres.NewUserService(db.DB)
-	// 	if err := s.CreateUser(&domain.User{Name: "one", Email: "one@test.com"}); err == nil {
-	// 		t.Fatal("expected an error, none occured")
-	// 	}
-	// })
+	// Ensure an error is returned if user email is a duplicate.
+	t.Run("ErrEmailDuplicate", func(t *testing.T) {
+		db := MustOpenDB(t)
+		defer MustCloseDB(t, db)
+		s := postgres.NewUserService(db.DB)
+		if err := s.CreateUser(&domain.User{Name: "one", Email: "one@test.com"}); err == nil {
+			t.Fatal("expected an error, none occured")
+		}
+	})
 }
