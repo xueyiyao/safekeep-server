@@ -112,3 +112,6 @@ func TestUserService_CreateUser(t *testing.T) {
 		}
 	})
 }
+
+func TestUserService_FindUser(t *testing.T) {
+}
