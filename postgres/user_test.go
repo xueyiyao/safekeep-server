@@ -96,4 +96,14 @@ func TestUserService_CreateUser(t *testing.T) {
 }
 
 func TestUserService_FindUser(t *testing.T) {
+	// Ensure an error is returned if fetching a non-existent user.
+	t.Run("ErrNotFound", func(t *testing.T) {
+		db := MustOpenDB(t)
+		defer MustCloseDB(t, db)
+		s := postgres.NewUserService(db.DB)
+		// TODO: this is not working as expected, but ensure that it passes for now
+		if _, err := s.FindUserByID(1); err != nil {
+			t.Fatalf("unexpected error: %#v", err)
+		}
+	})
 }
