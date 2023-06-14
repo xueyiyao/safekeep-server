@@ -9,12 +9,8 @@ import (
 
 func TestUserService_CreateUser(t *testing.T) {
 	t.Run("OK", func(t *testing.T) {
-		db := MustOpenDB(t)
-		tx := db.DB.Begin()
-		defer func() {
-			tx.Rollback()
-			MustCloseDB(t, db)
-		}()
+		db, tx := MustOpenDB(t)
+		defer MustCloseDB(t, db, tx, func() { resetSequence(db.DB, "users", "id", 1) })
 
 		s := postgres.NewUserService(tx)
 
@@ -50,12 +46,9 @@ func TestUserService_CreateUser(t *testing.T) {
 
 	// Ensure an error is returned if empty user.
 	t.Run("ErrNilUser", func(t *testing.T) {
-		db := MustOpenDB(t)
-		tx := db.DB.Begin()
-		defer func() {
-			tx.Rollback()
-			MustCloseDB(t, db)
-		}()
+		db, tx := MustOpenDB(t)
+		defer MustCloseDB(t, db, tx, func() { resetSequence(db.DB, "users", "id", 1) })
+
 		s := postgres.NewUserService(tx)
 		if err := s.CreateUser(nil); err == nil {
 			t.Fatal("expected an error, none occured")
@@ -64,12 +57,9 @@ func TestUserService_CreateUser(t *testing.T) {
 
 	// Ensure an error is returned if user name is not set.
 	t.Run("ErrNameRequired", func(t *testing.T) {
-		db := MustOpenDB(t)
-		tx := db.DB.Begin()
-		defer func() {
-			tx.Rollback()
-			MustCloseDB(t, db)
-		}()
+		db, tx := MustOpenDB(t)
+		defer MustCloseDB(t, db, tx, func() { resetSequence(db.DB, "users", "id", 1) })
+
 		s := postgres.NewUserService(tx)
 		if err := s.CreateUser(&domain.User{Email: "one@gmail.com"}); err == nil {
 			t.Fatal("expected an error, none occured")
@@ -78,12 +68,9 @@ func TestUserService_CreateUser(t *testing.T) {
 
 	// Ensure an error is returned if user email is not set.
 	t.Run("ErrEmailRequired", func(t *testing.T) {
-		db := MustOpenDB(t)
-		tx := db.DB.Begin()
-		defer func() {
-			tx.Rollback()
-			MustCloseDB(t, db)
-		}()
+		db, tx := MustOpenDB(t)
+		defer MustCloseDB(t, db, tx, func() { resetSequence(db.DB, "users", "id", 1) })
+
 		s := postgres.NewUserService(tx)
 		if err := s.CreateUser(&domain.User{Name: "one"}); err == nil {
 			t.Fatal("expected an error, none occured")
@@ -92,12 +79,9 @@ func TestUserService_CreateUser(t *testing.T) {
 
 	// Ensure an error is returned if user email is not valid.
 	t.Run("ErrEmailInvalid", func(t *testing.T) {
-		db := MustOpenDB(t)
-		tx := db.DB.Begin()
-		defer func() {
-			tx.Rollback()
-			MustCloseDB(t, db)
-		}()
+		db, tx := MustOpenDB(t)
+		defer MustCloseDB(t, db, tx, func() { resetSequence(db.DB, "users", "id", 1) })
+
 		s := postgres.NewUserService(tx)
 		if err := s.CreateUser(&domain.User{Name: "one", Email: "asdfjkl;"}); err == nil {
 			t.Fatal("expected an error, none occured")
@@ -106,18 +90,15 @@ func TestUserService_CreateUser(t *testing.T) {
 
 	// Ensure an error is returned if user email is a duplicate.
 	t.Run("ErrEmailDuplicate", func(t *testing.T) {
-		db := MustOpenDB(t)
-		tx := db.DB.Begin()
-		defer func() {
-			tx.Rollback()
-			MustCloseDB(t, db)
-		}()
+		db, tx := MustOpenDB(t)
+		defer MustCloseDB(t, db, tx, func() { resetSequence(db.DB, "users", "id", 1) })
 
 		s := postgres.NewUserService(tx)
-
 		u := &domain.User{Name: "one", Email: "one@test.com"}
 		if err := s.CreateUser(u); err != nil {
 			t.Fatal(err)
+		} else if got, want := u.ID, 1; int(got) != want {
+			t.Fatalf("ID=%v, want %v", got, want)
 		}
 		if err := s.CreateUser(&domain.User{Name: "one", Email: "one@test.com"}); err == nil {
 			t.Fatal("expected an error, none occured")
@@ -128,12 +109,9 @@ func TestUserService_CreateUser(t *testing.T) {
 func TestUserService_FindUser(t *testing.T) {
 	// Ensure an error is returned if fetching a non-existent user.
 	t.Run("ErrNotFound", func(t *testing.T) {
-		db := MustOpenDB(t)
-		tx := db.DB.Begin()
-		defer func() {
-			tx.Rollback()
-			MustCloseDB(t, db)
-		}()
+		db, tx := MustOpenDB(t)
+		defer MustCloseDB(t, db, tx, func() { resetSequence(db.DB, "users", "id", 1) })
+
 		s := postgres.NewUserService(tx)
 		if user, err := s.FindUserByID(1); err == nil {
 			t.Fatalf("expected an error, none occured %v", user)
