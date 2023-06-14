@@ -8,14 +8,15 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/xueyiyao/safekeep/internal/path"
 	"github.com/xueyiyao/safekeep/postgres"
+	"gorm.io/gorm"
 )
 
 func TestDB(t *testing.T) {
-	db := MustOpenDB(t)
-	MustCloseDB(t, db)
+	db, tx := MustOpenDB(t)
+	MustCloseDB(t, db, tx, func() {})
 }
 
-func MustOpenDB(tb testing.TB) *postgres.DB {
+func MustOpenDB(tb testing.TB) (*postgres.DB, *gorm.DB) {
 	tb.Helper()
 
 	if err := godotenv.Load(path.Root + "/.env"); err != nil {
@@ -27,12 +28,21 @@ func MustOpenDB(tb testing.TB) *postgres.DB {
 	if err := db.Open(); err != nil {
 		tb.Fatal(err)
 	}
+	tx := db.DB.Begin()
+	if tx.Error != nil {
+		tb.Fatal(tx.Error)
+	}
 
-	return db
+	return db, tx
 }
 
-func MustCloseDB(tb testing.TB, db *postgres.DB) {
+func MustCloseDB(tb testing.TB, db *postgres.DB, tx *gorm.DB, teardown func()) {
 	tb.Helper()
+
+	if err := tx.Rollback(); err.Error != nil {
+		tb.Fatal(err.Error)
+	}
+	teardown()
 
 	if err := db.Close(); err != nil {
 		tb.Fatal(err)
@@ -47,4 +57,9 @@ func getDSN() string {
 	dbname := os.Getenv("TEST_DB_NAME")
 
 	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+}
+
+func resetSequence(db *gorm.DB, tableName string, columnName string, resetTo int) error {
+	query := fmt.Sprintf("SELECT setval(pg_get_serial_sequence('%s', '%s'), %d, false)", tableName, columnName, resetTo)
+	return db.Exec(query).Error
 }
