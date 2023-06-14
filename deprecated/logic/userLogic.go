@@ -3,7 +3,7 @@ package logic
 import (
 	"errors"
 
-	"github.com/xueyiyao/safekeep/dao"
+	"github.com/xueyiyao/safekeep/deprecated/dao"
 	"github.com/xueyiyao/safekeep/models"
 	"gorm.io/gorm"
 )
