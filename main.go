@@ -48,6 +48,9 @@ func (m *Main) Run() (err error) {
 	containerService := postgres.NewContainerService(m.DB.DB)
 	itemServce := postgres.NewItemService(m.DB.DB)
 
+	m.HTTPServer.GoogleClientID = os.Getenv("GOOGLE_CLIENT_ID")
+	m.HTTPServer.GoogleClientSecret = os.Getenv("GOOGLE_CLIENT_SECRET")
+
 	m.HTTPServer.UserService = userService
 	m.HTTPServer.ContainerService = containerService
 	m.HTTPServer.ItemService = itemServce
