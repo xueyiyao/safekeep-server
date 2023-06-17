@@ -8,8 +8,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/xueyiyao/safekeep/initializers"
-	"github.com/xueyiyao/safekeep/models"
 )
 
 func RequireAuth(c *gin.Context) {
@@ -41,19 +39,17 @@ func RequireAuth(c *gin.Context) {
 		}
 
 		// Check if user
-		var user models.User
-		initializers.DB.First(&user, claims["sub"])
+		userID := claims["sub"]
 
-		if user.ID == 0 {
+		if userID == 0 {
 			c.AbortWithStatus(http.StatusUnauthorized)
 		}
 
 		// Attach to request
-		c.Set("user", user)
+		c.Set("user", userID)
 
 		// Continue
 		c.Next()
-
 	} else {
 		c.AbortWithStatus(http.StatusUnauthorized)
 	}

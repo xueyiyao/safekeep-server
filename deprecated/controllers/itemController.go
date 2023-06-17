@@ -4,8 +4,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/xueyiyao/safekeep/initializers"
-	"github.com/xueyiyao/safekeep/models"
+	"github.com/xueyiyao/safekeep/deprecated/initializers"
+	"github.com/xueyiyao/safekeep/deprecated/models"
 	"gorm.io/gorm"
 )
 

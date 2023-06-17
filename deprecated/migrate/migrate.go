@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/xueyiyao/safekeep/initializers"
-	"github.com/xueyiyao/safekeep/models"
+	"github.com/xueyiyao/safekeep/deprecated/initializers"
+	"github.com/xueyiyao/safekeep/deprecated/models"
 )
 
 func init() {

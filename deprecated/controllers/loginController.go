@@ -10,8 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/xueyiyao/safekeep/deprecated/initializers"
-	"github.com/xueyiyao/safekeep/models"
-	"github.com/xueyiyao/safekeep/models/google"
+	"github.com/xueyiyao/safekeep/deprecated/models"
+	"github.com/xueyiyao/safekeep/deprecated/models/google"
 	"golang.org/x/oauth2"
 )
 
