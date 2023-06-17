@@ -3,8 +3,8 @@ package dao
 import (
 	"errors"
 
-	"github.com/xueyiyao/safekeep/initializers"
-	"github.com/xueyiyao/safekeep/models"
+	"github.com/xueyiyao/safekeep/deprecated/initializers"
+	"github.com/xueyiyao/safekeep/deprecated/models"
 	"gorm.io/gorm"
 )
 

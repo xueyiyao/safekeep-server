@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/xueyiyao/safekeep/deprecated/logic"
-	"github.com/xueyiyao/safekeep/models"
+	"github.com/xueyiyao/safekeep/deprecated/models"
 )
 
 func CreateUser(c *gin.Context) {

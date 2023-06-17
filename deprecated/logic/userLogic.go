@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/xueyiyao/safekeep/deprecated/dao"
-	"github.com/xueyiyao/safekeep/models"
+	"github.com/xueyiyao/safekeep/deprecated/models"
 	"gorm.io/gorm"
 )
 

@@ -10,7 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/xueyiyao/safekeep/domain"
-	"github.com/xueyiyao/safekeep/models/google"
 	"golang.org/x/oauth2"
 )
 
@@ -65,7 +64,7 @@ func (s *Server) handleOauthGoogleCallback(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{})
 }
 
-func (s *Server) getUserInfo(state string, code string) (*google.GoogleUserEmailResponse, error) {
+func (s *Server) getUserInfo(state string, code string) (*GoogleUserEmailResponse, error) {
 	// TODO: Remember to randomize state string
 	if state != OAuthStateString {
 		return nil, fmt.Errorf("invalid oauth state")
@@ -79,11 +78,18 @@ func (s *Server) getUserInfo(state string, code string) (*google.GoogleUserEmail
 		return nil, fmt.Errorf("failed getting user info: %s", err.Error())
 	}
 	defer response.Body.Close()
-	var contents *google.GoogleUserEmailResponse
+	var contents *GoogleUserEmailResponse
 
 	err = json.NewDecoder(response.Body).Decode(&contents)
 	if err != nil {
 		return nil, fmt.Errorf("failed reading response body: %s", err.Error())
 	}
 	return contents, nil
+}
+
+type GoogleUserEmailResponse struct {
+	Email    string `json:"email"`
+	Id       string `json:"id"`
+	Picture  string `json:"picture"`
+	Verified bool   `json:"verified_email"`
 }
