@@ -7,18 +7,18 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/xueyiyao/safekeep/controllers"
+	routes "github.com/xueyiyao/safekeep/deprecated/routers"
 	HTTP "github.com/xueyiyao/safekeep/http"
 	initializers "github.com/xueyiyao/safekeep/initializers"
 	"github.com/xueyiyao/safekeep/middleware"
 	"github.com/xueyiyao/safekeep/postgres"
-	routes "github.com/xueyiyao/safekeep/routers"
 )
 
 // Runs before main
 func init() {
 	initializers.LoadEnvVars()
 	// initializers.ConnectToDB()
-	initializers.SetupOAuthLogin()
+	// initializers.SetupOAuthLogin()
 }
 
 func main() {

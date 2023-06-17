@@ -9,7 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/xueyiyao/safekeep/initializers"
+	"github.com/xueyiyao/safekeep/deprecated/initializers"
 	"github.com/xueyiyao/safekeep/models"
 	"github.com/xueyiyao/safekeep/models/google"
 	"golang.org/x/oauth2"
@@ -32,7 +32,7 @@ func HandleGoogleLogin(c *gin.Context) {
 
 	var user models.User
 	if content.Email != "alleny111@gmail.com" {
-		initializers.DB.Where(models.User{Email: content.Email}).FirstOrCreate(&user)
+		// initializers.DB.Where(models.User{Email: content.Email}).FirstOrCreate(&user)
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{

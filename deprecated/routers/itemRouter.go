@@ -2,7 +2,7 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/xueyiyao/safekeep/controllers"
+	"github.com/xueyiyao/safekeep/deprecated/controllers"
 )
 
 func ItemRoutes(router *gin.Engine) {
