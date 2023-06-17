@@ -42,6 +42,7 @@ func (s *Server) handleOauthGoogleCallback(c *gin.Context) {
 	var user domain.User
 	if content.Email != testEmail {
 		// create new user?
+		// initializers.DB.Where(domain.User{Email: content.Email}).FirstOrCreate(&user)
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
