@@ -15,6 +15,8 @@ import (
 	"golang.org/x/oauth2"
 )
 
+var OAuthStateString = "pseudo-random"
+
 func (s *Server) RegisterAuthRoutes(router *gin.Engine) {
 	oauthRouter := router.Group("/oauth")
 	{
@@ -63,8 +65,8 @@ func (s *Server) handleOauthGoogleCallback(c *gin.Context) {
 }
 
 func (s *Server) getUserInfo(state string, code string) (*google.GoogleUserEmailResponse, error) {
-	// TODO: Remember to randomize state string and remove initializers dependency
-	if state != initializers.OAuthStateString {
+	// TODO: Remember to randomize state string
+	if state != OAuthStateString {
 		return nil, fmt.Errorf("invalid oauth state")
 	}
 	token, err := s.OAuth2Config().Exchange(oauth2.NoContext, code)
