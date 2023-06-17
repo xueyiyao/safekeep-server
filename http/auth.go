@@ -10,10 +10,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/xueyiyao/safekeep/domain"
-	"github.com/xueyiyao/safekeep/initializers"
 	"github.com/xueyiyao/safekeep/models/google"
 	"golang.org/x/oauth2"
 )
+
+var OAuthStateString = "pseudo-random"
+var testEmail = ""
 
 func (s *Server) RegisterAuthRoutes(router *gin.Engine) {
 	oauthRouter := router.Group("/oauth")
@@ -38,8 +40,9 @@ func (s *Server) handleOauthGoogleCallback(c *gin.Context) {
 	}
 
 	var user domain.User
-	if content.Email != "alleny111@gmail.com" {
-		initializers.DB.Where(domain.User{Email: content.Email}).FirstOrCreate(&user)
+	if content.Email != testEmail {
+		// create new user?
+		// initializers.DB.Where(domain.User{Email: content.Email}).FirstOrCreate(&user)
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
@@ -63,8 +66,8 @@ func (s *Server) handleOauthGoogleCallback(c *gin.Context) {
 }
 
 func (s *Server) getUserInfo(state string, code string) (*google.GoogleUserEmailResponse, error) {
-	// TODO: Remember to randomize state string and remove initializers dependency
-	if state != initializers.OAuthStateString {
+	// TODO: Remember to randomize state string
+	if state != OAuthStateString {
 		return nil, fmt.Errorf("invalid oauth state")
 	}
 	token, err := s.OAuth2Config().Exchange(oauth2.NoContext, code)
