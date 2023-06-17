@@ -2,21 +2,25 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/xueyiyao/safekeep/controllers"
+	"github.com/joho/godotenv"
+	"github.com/xueyiyao/safekeep/deprecated/controllers"
 	routes "github.com/xueyiyao/safekeep/deprecated/routers"
 	HTTP "github.com/xueyiyao/safekeep/http"
-	initializers "github.com/xueyiyao/safekeep/initializers"
 	"github.com/xueyiyao/safekeep/middleware"
 	"github.com/xueyiyao/safekeep/postgres"
 )
 
 // Runs before main
 func init() {
-	initializers.LoadEnvVars()
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	// initializers.ConnectToDB()
 	// initializers.SetupOAuthLogin()
 }

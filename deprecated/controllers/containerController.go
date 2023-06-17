@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/xueyiyao/safekeep/initializers"
-	"github.com/xueyiyao/safekeep/models"
+	"github.com/xueyiyao/safekeep/deprecated/initializers"
+	"github.com/xueyiyao/safekeep/deprecated/models"
 )
 
 func CreateContainer(c *gin.Context) {
