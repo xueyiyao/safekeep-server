@@ -10,12 +10,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/xueyiyao/safekeep/domain"
-	"github.com/xueyiyao/safekeep/initializers"
 	"github.com/xueyiyao/safekeep/models/google"
 	"golang.org/x/oauth2"
 )
 
 var OAuthStateString = "pseudo-random"
+var testEmail = ""
 
 func (s *Server) RegisterAuthRoutes(router *gin.Engine) {
 	oauthRouter := router.Group("/oauth")
@@ -40,8 +40,8 @@ func (s *Server) handleOauthGoogleCallback(c *gin.Context) {
 	}
 
 	var user domain.User
-	if content.Email != "alleny111@gmail.com" {
-		initializers.DB.Where(domain.User{Email: content.Email}).FirstOrCreate(&user)
+	if content.Email != testEmail {
+		// create new user?
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
