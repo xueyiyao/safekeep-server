@@ -95,11 +95,7 @@ func TestUserService_CreateUser(t *testing.T) {
 
 		s := postgres.NewUserService(tx)
 		u := &domain.User{Name: "one", Email: "one@test.com"}
-		if err := s.CreateUser(u); err != nil {
-			t.Fatal(err)
-		} else if got, want := u.ID, 1; int(got) != want {
-			t.Fatalf("ID=%v, want %v", got, want)
-		}
+		MustCreateUser(t, s, u)
 		if err := s.CreateUser(&domain.User{Name: "one", Email: "one@test.com"}); err == nil {
 			t.Fatal("expected an error, none occured")
 		}
@@ -117,4 +113,49 @@ func TestUserService_FindUser(t *testing.T) {
 			t.Fatalf("expected an error, none occured %v", user)
 		}
 	})
+}
+
+func TestUserService_UpdateUser(t *testing.T) {
+	// Ensure user name & email can be updated by current user.
+	t.Run("ErrNotFound", func(t *testing.T) {
+		db, tx := MustOpenDB(t)
+		defer MustCloseDB(t, db, tx, func() { resetSequence(db.DB, "users", "id", 1) })
+
+		s := postgres.NewUserService(tx)
+
+		user := MustCreateUser(t, s, &domain.User{
+			Name:  "one",
+			Email: "one@gmail.com",
+		})
+
+		// Update user.
+		newName, newEmail := "two", "two@gmail.com"
+		_, err := s.UpdateUser(&domain.User{
+			ID:    user.ID,
+			Name:  newName,
+			Email: newEmail,
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		// Fetch user from database & compare.
+		if user, err := s.FindUserByID(1); err != nil {
+			t.Fatal(err)
+		} else if got, want := user.Name, "two"; got != want {
+			t.Fatalf("Name=%v, want %v", got, want)
+		} else if got, want := user.Email, "two@gmail.com"; got != want {
+			t.Fatalf("Email=%v, want %v", got, want)
+		}
+		// Reflect DeepEqual here
+	})
+}
+
+// MustCreateUser creates a user in the database. Fatal on error.
+func MustCreateUser(tb testing.TB, s *postgres.UserService, user *domain.User) *domain.User {
+	tb.Helper()
+	if err := s.CreateUser(user); err != nil {
+		tb.Fatal(err)
+	}
+	return user
 }
