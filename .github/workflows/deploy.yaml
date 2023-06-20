@@ -16,7 +16,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Auth
+      - name: Google Auth
         uses: "google-github-actions/auth@v1"
         with:
           credentials_json: "${{ secrets.GCP_CREDENTIALS }}"
