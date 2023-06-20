@@ -27,9 +27,6 @@ jobs:
       - name: Configure Docker
         run: gcloud auth configure-docker --quiet
 
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
       - name: Create .env file
         run: |
           echo "${{ secrets.ENV_FILE }}" > .env
