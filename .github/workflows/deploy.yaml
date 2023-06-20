@@ -19,6 +19,10 @@ jobs:
           project_id: safekeep-382003
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
 
+      - name: Create .env file
+        run: |
+          echo "${{ secrets.ENV_FILE }}" > .env
+
       - name: Build and push Docker image
         run: |
           docker build -t gcr.io/safekeep-382003/safekeep-server:$GITHUB_SHA .
