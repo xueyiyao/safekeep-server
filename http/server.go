@@ -39,6 +39,13 @@ func (s *Server) Run() error {
 		AllowHeaders: []string{"Content-Type, access-control-allow-origin, access-control-allow-headers, user-id"},
 	}))
 
+	// Base route
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "shhhh!",
+		})
+	})
+
 	// Register unauthenticated routes
 	{
 		s.RegisterAuthRoutes(r)
