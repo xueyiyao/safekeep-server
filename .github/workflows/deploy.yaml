@@ -1,37 +1,43 @@
-name: Deploy to Google Cloud
+name: Docker
 
 on:
   push:
-    branches:
-      - main
+    branches: [master]
+  pull_request:
+    branches: [master]
 
 jobs:
   deploy:
+    name: Setup Gcloud Account
     runs-on: ubuntu-latest
-
+    env:
+      IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_APP_NAME }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v0.3.0
+      - name: Login
+        uses: google-github-actions/setup-gcloud@v0
         with:
-          project_id: safekeep-382003
-          service_account_key: ${{ secrets.GCLOUD_AUTH }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_email: ${{ secrets.GCP_EMAIL }}
+          service_account_key: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker --quiet
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       - name: Create .env file
         run: |
           echo "${{ secrets.ENV_FILE }}" > .env
 
-      - name: Build and push Docker image
-        run: |
-          docker build -t gcr.io/safekeep-382003/safekeep-server:$GITHUB_SHA .
-          docker push gcr.io/safekeep-382003/safekeep-server:$GITHUB_SHA
+      - name: Build Docker image
+        run: docker build . -t $IMAGE_NAME
 
-      - name: Deploy to Google Cloud Run
-        run: |
-          gcloud run deploy your-service-name \
-            --image gcr.io/your-project-id/safekeep-server:$GITHUB_SHA \
-            --platform managed \
-            --region your-region \
-            --allow-unauthenticated
+      - name: Test Docker image
+        run: docker run $IMAGE_NAME sh -c "go test -v"
+
+      - name: Push Docker image
+        run: docker push $IMAGE_NAME
+
+      - name: Deploy Docker image
+        run: gcloud run deploy ${{ secrets.GCP_PROJECT_ID }} --image $IMAGE_NAME --region us-central1 --platform managed
