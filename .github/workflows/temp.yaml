@@ -1,1 +1,23 @@
+name: Temp
+on:
+  pull_request:
+    branches: [main]
 
+
+jobs:
+  debug:
+    name: Debug
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Set up temp file
+      env:
+        DEBUG: ${{ secrets.ENV_FILE }}
+      run: |
+        echo $DEBUG >> temp.txt
+
+    - name: Run tmate
+      uses: mxschmitt/action-tmate@v2
