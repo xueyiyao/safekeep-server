@@ -1,7 +1,13 @@
 package http
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"log"
+	"net/http"
+	"os"
+	"strconv"
+	"strings"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -40,11 +46,7 @@ func (s *Server) Run() error {
 	}))
 
 	// Base route
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "shhhh!",
-		})
-	})
+	s.handleIndex(r)
 
 	// Register unauthenticated routes
 	{
@@ -52,6 +54,7 @@ func (s *Server) Run() error {
 	}
 
 	// Register authenticated routes
+	r.Use(s.authenticate)
 	{
 		s.registerUserRoutes(r)
 		s.RegisterContainerRoutes(r)
@@ -66,6 +69,34 @@ func (s *Server) Run() error {
 	}
 
 	return nil
+}
+
+func (s *Server) authenticate(c *gin.Context) {
+	id, err := strconv.Atoi(c.Request.Header.Get("user-id"))
+	if err != nil {
+		log.Printf("Could not parse user ID: %v", err)
+		c.AbortWithStatus(http.StatusUnauthorized)
+	}
+	auth := c.Request.Header.Get("Authorization")
+
+	user, err := s.UserService.FindUserByID(id)
+
+	hash := md5.Sum([]byte(user.Email + os.Getenv("TIMESTAMP") + os.Getenv("SALT")))
+
+	if strings.ToLower(hex.EncodeToString(hash[:])) != strings.ToLower(auth) {
+		log.Printf("User %v with incorrect authorization", id)
+		c.AbortWithStatus(http.StatusUnauthorized)
+	}
+
+	c.Next()
+}
+
+func (s *Server) handleIndex(router *gin.Engine) {
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "shhhh!",
+		})
+	})
 }
 
 func (s *Server) OAuth2Config() *oauth2.Config {
